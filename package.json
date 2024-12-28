@@ -1,0 +1,28 @@
+{
+  "name": "uni_dashboard_be",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/Vaden89/studentDashboard_BE#readme",
+  "bugs": {
+    "url": "https://github.com/Vaden89/studentDashboard_BE/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vaden89/studentDashboard_BE.git"
+  },
+  "license": "ISC",
+  "author": "Isaac Shosanya",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --env-file=.env index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.2",
+    "nodemon": "^3.1.9"
+  }
+}
