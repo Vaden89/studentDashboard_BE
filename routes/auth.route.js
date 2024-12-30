@@ -63,4 +63,18 @@ router.post("/login", async (req, res) => {
   }
 });
 
+router.get("/get-user", async (req, res) => {
+  const userID = req.user.id;
+
+  try {
+    const user = await User.findById(userID);
+    res.send(201).json({
+      message: "Successfully Retrieved User Information",
+      data: user,
+    });
+  } catch (error) {
+    res.send(500).json({ error: error.message });
+  }
+});
+
 export default router;

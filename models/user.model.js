@@ -2,14 +2,32 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
 const UserSchema = mongoose.Schema({
-  username: {
+  full_name: {
     type: String,
-    required: [true, "Please enter matric number"],
+    required: [true, "Please include your fullname"],
+  },
+  email: {
+    type: String,
+    required: [true, "Please include your email"],
   },
   password: {
     type: String,
-    required: [true, "Please enter a password"],
+    required: [true, "Please include a password"],
     select: false,
+  },
+  role: {
+    type: String,
+    enum: ["STUDENT", "LECTURER", "COURSE_ADVIOSR"],
+    required: true,
+  },
+  school_ID: {
+    type: String,
+    required: [true, "Please include the staff ID"],
+  },
+  //For only students only
+
+  level: {
+    type: Number,
   },
 });
 

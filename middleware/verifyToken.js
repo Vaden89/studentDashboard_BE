@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || authHeader.split(" ")[0] !== "Bearer")
-    return res.status(401).send({ error: "Un-Authorized 'No bearer token' " });
+    return res.status(401).send({ error: "Unauthorized" });
 
   try {
     const token = authHeader.split(" ")[1];
@@ -11,7 +11,7 @@ const verifyToken = (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    res.status(401).send({ error: "Un-Authorized 'Invalid token'" });
+    res.status(401).send({ error: "Invalid token" });
   }
 };
 
