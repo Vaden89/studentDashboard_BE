@@ -1,11 +1,36 @@
 import express from "express";
-import Course from "../models/course.model.js";
-import StudentCourse from "../models/student_course.model.js";
-import { verifyToken } from "../middleware/verifyToken.js";
+import { Course } from "../models/course.model.js";
+import { StudentCourse } from "../models/student_course.model.js";
+import verifyToken from "../middleware/verifyToken.js";
 
 const router = express.Router();
 
-//get user courses
+//get student courses
+router.get("/student-courses", verifyToken, async (req, res) => {
+  const user = req.user.user;
+  if (user.role !== "STUDENT") {
+    res
+      .status(403)
+      .json({ error: "Only students can view their offered courses" });
+  }
+
+  try {
+    const studentCourses = await StudentCourse.find({
+      student: user.id,
+    }).populate({
+      path: "course",
+      populate: {
+        path: "lecturer",
+        select: "name",
+      },
+    });
+
+    const courses = studentCourses.map((sc) => sc.course);
+    res.status(200).json({ courses });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 //register for courses
 router.post("/register_courses", verifyToken, async (req, res) => {
@@ -50,3 +75,5 @@ router.post("/register_courses", verifyToken, async (req, res) => {
 });
 
 //view grades
+
+export default router;

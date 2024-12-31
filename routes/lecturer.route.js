@@ -6,11 +6,31 @@ import { StudentCourse } from "../models/student_course.model.js";
 const router = express.Router();
 
 //get assigned courses
+router.get("/courses", verifyToken, async (req, res) => {
+  const user = req.user.user;
+  if (user.role !== "LECTURER") {
+    res.status(403).json({
+      error: "Only lecturers can view their assigned courses",
+    });
+  }
+
+  try {
+    const courses = await Course.find({ lecturer: user.id });
+    res.status(200).json({
+      courses,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
 
 //get students registered under assigned course
-router.get("/get-student/:id", verifyToken, async (req, res) => {
+router.get("/course-students/:id", verifyToken, async (req, res) => {
   const courseID = req.params;
-  if (req.user.role !== "LECTURER") {
+  const userData = req.user.user;
+  if (userData.role !== "LECTURER") {
     res.status(403).json({ error: "Only lecturers can view students " });
   }
 
@@ -20,7 +40,7 @@ router.get("/get-student/:id", verifyToken, async (req, res) => {
       return res.status(404).json({ error: "Course Could not be found" });
     }
 
-    if (course.lecturer.toString() !== req.user.id) {
+    if (course.lecturer.toString() !== userData.id) {
       return res
         .status(403)
         .json({ error: "You are not assigned to this course" });
@@ -39,3 +59,5 @@ router.get("/get-student/:id", verifyToken, async (req, res) => {
 });
 
 //grade student
+
+export default router;

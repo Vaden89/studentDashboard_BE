@@ -5,12 +5,8 @@ import { User } from "../models/user.model.js";
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
-  const { username, password } = req.body;
-  const user = await User.findOne({ username });
-  if (!username.length > 3)
-    return res
-      .status(400)
-      .json({ error: "Username must be minimum of 3 characters" });
+  const user = await User.findOne({ school_ID: req.body.school_ID });
+  const { password } = req.body;
 
   if (!password.length > 8)
     return res
@@ -19,7 +15,7 @@ router.post("/register", async (req, res) => {
 
   if (!user) {
     try {
-      const user = new User({ username, password });
+      const user = new User(req.body);
       await user.save();
       res.status(201).json({ message: "User registered successfully!" });
     } catch (err) {
@@ -31,10 +27,10 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+  const { school_ID, password } = req.body;
   try {
     // Check if user exists
-    const user = await User.findOne({ username }).select("+password");
+    const user = await User.findOne({ school_ID }).select("+password");
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -46,7 +42,7 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ user }, process.env.JWT_SECRET, {
       expiresIn: "24h",
     });
 
