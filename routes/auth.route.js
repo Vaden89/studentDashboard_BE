@@ -1,5 +1,6 @@
 import express from "express";
 import jwt from "jsonwebtoken";
+import { body, validationResult } from "express-validator";
 import { User } from "../models/user.model.js";
 
 const router = express.Router();
@@ -26,38 +27,57 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/login", async (req, res) => {
-  const { school_ID, password } = req.body;
-  try {
-    // Check if user exists
-    const user = await User.findOne({ school_ID }).select("+password");
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+router.post(
+  "/login",
+  [
+    body("password")
+      .isLength({ min: 8 })
+      .matches(/[-_$#]/)
+      .withMessage("Passwords must be at least 8 characters in length"),
+    body("school_ID")
+      .trim()
+      .notEmpty()
+      .withMessage("School Id cannot be empty!"),
+  ],
+  async (req, res) => {
+    const { school_ID, password } = req.body;
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      res.status(400).json({ error: "Invalid Data passed", errors: errors });
     }
 
-    // Validate password
-    const isMatch = await user.comparePassword(password);
+    try {
+      // Check if user exists
+      const user = await User.findOne({ school_ID }).select("+password");
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
 
-    if (!isMatch) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      // Validate password
+      const isMatch = await user.comparePassword(password);
+
+      if (!isMatch) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
+      const token = jwt.sign({ user }, process.env.JWT_SECRET, {
+        expiresIn: "24h",
+      });
+
+      const { password: _, ...userData } = user.toObject();
+      res.status(200).json({
+        status: "success",
+        accessToken: token,
+        data: {
+          user: userData,
+        },
+      });
+    } catch (err) {
+      res.status(500).json({ error: "Error logging in" });
     }
-
-    const token = jwt.sign({ user }, process.env.JWT_SECRET, {
-      expiresIn: "24h",
-    });
-
-    const { password: _, ...userData } = user.toObject();
-    res.status(200).json({
-      status: "success",
-      accessToken: token,
-      data: {
-        user: userData,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Error logging in" });
   }
-});
+);
 
 router.get("/get-user", async (req, res) => {
   const userID = req.user.id;
