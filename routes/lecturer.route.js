@@ -1,6 +1,6 @@
 import express from "express";
-import verifyToken from "../middleware/verifyToken.js";
 import { Course } from "../models/course.model.js";
+import verifyToken from "../middleware/verifyToken.js";
 import { StudentCourse } from "../models/student_course.model.js";
 
 const router = express.Router();
