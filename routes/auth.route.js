@@ -1,5 +1,6 @@
 import express from "express";
 import jwt from "jsonwebtoken";
+import { body, validationResult } from "express-validator";
 import { User } from "../models/user.model.js";
 import verifyToken from "../middleware/verifyToken.js";
 import { body, validationResult, checkSchema } from "express-validator";
