@@ -57,9 +57,8 @@ export const createUserValidationSchema = {
   role: {
     ...commonChecks,
     isIn: {
-      options: [["STUDENT", "COURSE_ADVISOR", "LECTURER"]],
-      errorMessage:
-        "role must be one of the following: admin, student, lecturer",
+      options: [["STUDENT", "HOD", "LECTURER"]],
+      errorMessage: "role must be one of the following: HOD, STUDENT, LECTURER",
     },
   },
   level: {

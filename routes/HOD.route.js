@@ -10,7 +10,7 @@ const router = express.Router();
 //get all students
 router.get("/students", verifyToken, async (req, res) => {
   const userData = req.user.user;
-  if (userData.role !== "COURSE_ADVISOR") {
+  if (userData.role !== "HOD") {
     return res
       .status(403)
       .json({ error: "Only course advisor can view all students" });
@@ -19,7 +19,6 @@ router.get("/students", verifyToken, async (req, res) => {
   try {
     const students = await User.find({
       role: "STUDENT",
-      level: userData.level,
     });
     res.status(200).json({ message: "", data: students });
   } catch (error) {
@@ -46,13 +45,13 @@ router.post(
         .json({ error: "Invalid data", errors: formattedErrors });
     }
 
-    if (userData.role !== "COURSE_ADVISOR") {
+    if (userData.role !== "HOD") {
       return res
         .status(403)
-        .json({ error: "Only course advisors can create a course" });
+        .json({ error: "Only Head of Departments can create a course" });
     }
 
-    const { name, course_code, lecturer } = req.body;
+    const { name, course_code, lecturer, level } = req.body;
 
     try {
       const isNameMatch = await Course.findOne({ name });
@@ -71,7 +70,7 @@ router.post(
         name,
         course_code,
         lecturer,
-        level: userData.level,
+        level,
       });
       await course.save();
 

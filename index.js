@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import authRouter from "./routes/auth.route.js";
 import studentRouter from "./routes/student.route.js";
 import lecturerRouter from "./routes/lecturer.route.js";
-import courseAdvisorRouter from "./routes/course_advisor.route.js";
+import HODRoute from "./routes/HOD.route.js";
 
 const app = express();
 app.use(express.json());
@@ -12,7 +12,7 @@ const PORT = process.env.PORT;
 app.use("/auth", authRouter);
 app.use("/student", studentRouter);
 app.use("/lecturer", lecturerRouter);
-app.use("/course-advisor", courseAdvisorRouter);
+app.use("/hod", HODRoute);
 
 mongoose
   .connect(process.env.DB_URI)

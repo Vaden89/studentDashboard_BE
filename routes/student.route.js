@@ -6,7 +6,7 @@ import verifyToken from "../middleware/verifyToken.js";
 const router = express.Router();
 
 //get student courses
-router.get("/student-courses", verifyToken, async (req, res) => {
+router.get("/courses", verifyToken, async (req, res) => {
   const user = req.user.user;
   if (user.role !== "STUDENT") {
     res
@@ -16,7 +16,7 @@ router.get("/student-courses", verifyToken, async (req, res) => {
 
   try {
     const studentCourses = await StudentCourse.find({
-      student: user.id,
+      student: user._id,
     }).populate({
       path: "course",
       populate: {
@@ -33,11 +33,11 @@ router.get("/student-courses", verifyToken, async (req, res) => {
 });
 
 //register for courses
-router.post("/register_courses", verifyToken, async (req, res) => {
+router.post("/register-courses", verifyToken, async (req, res) => {
   const { courses } = req.body;
-  const userId = req.user.id;
+  const user = req.user.user;
 
-  if (req.user.role !== "STUDENT") {
+  if (user.role !== "STUDENT") {
     return res
       .status(403)
       .json({ error: "Only students can register for courses" });
@@ -51,7 +51,7 @@ router.post("/register_courses", verifyToken, async (req, res) => {
       }
 
       const existingRegistration = await StudentCourse.findOne({
-        student: userId,
+        student: user._id,
         course: courseId,
       });
 
@@ -62,7 +62,7 @@ router.post("/register_courses", verifyToken, async (req, res) => {
       }
 
       const studentCourse = new StudentCourse({
-        student: userId,
+        student: user._id,
         course: courseId,
       });
       await studentCourse.save();
@@ -75,7 +75,7 @@ router.post("/register_courses", verifyToken, async (req, res) => {
 });
 
 //view all courses
-router.get("/courses", verifyToken, async (req, res) => {
+router.get("/course-list", verifyToken, async (req, res) => {
   try {
     const courses = await Course.find().populate("lecturer");
     res.status(200).json({ courses });

@@ -1,6 +1,5 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import { body, validationResult } from "express-validator";
 import { User } from "../models/user.model.js";
 import verifyToken from "../middleware/verifyToken.js";
 import { body, validationResult, checkSchema } from "express-validator";
@@ -99,17 +98,16 @@ router.post(
   }
 );
 
-router.get("/get-user", verifyToken, async (req, res) => {
-  const userID = req.user.user.id;
-
+router.get("/user", verifyToken, async (req, res) => {
+  const userID = req.user.user;
   try {
     const user = await User.findById(userID);
-    res.send(201).json({
+    res.status(201).json({
       message: "Successfully Retrieved User Information",
       data: user,
     });
   } catch (error) {
-    res.send(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
